@@ -1,0 +1,46 @@
+var filePath = path.join(__dirname, sourceFile);
+var readstream = require('fs').createReadStream(filePath)
+    , buffer = []
+    , len = 0;
+readstream.on('data', function(data) {
+    buffer.push(data);
+    len += data.length;
+});
+readstream.on('end', function() {
+    buffer = Buffer.concat(buffer, len);
+    var start = new Date().getTime();
+    request.post({
+        headers: {'content-type' : 'application/octet-stream'},
+        url:     url,
+        body:    buffer
+    }, function(error, response, body){
+        var end = new Date().getTime();
+        var diff_time = end - start;
+        //console.log('Execution time in milliseconds: ' + diff_time);
+        //console.log('File size in bytes: ' + stats.size);
+        var speed_bytes_per_millisecs = buffer.length / diff_time;
+        //console.log('Speed: ' + speed_bytes_per_millisecs + 'Bpms');
+        var speed_bytes_per_sec = speed_bytes_per_millisecs * 1000;
+        //console.log('Speed: ' + speed_bytes_per_sec + 'Bps');
+        var speed_Kbytes_per_sec = speed_bytes_per_sec / 1000;
+        //console.log('Speed: ' + speed_Kbytes_per_sec + 'KBps');
+        var speed_Mbytes_per_sec = speed_Kbytes_per_sec / 1000;
+        //console.log('Speed: ' + speed_Mbytes_per_sec + 'MBps');
+        _speedArray.push(parseFloat(speed_Kbytes_per_sec));
+
+        console.log('Execution time in milliseconds: ' + diff_time);
+        var size_in_bits = buffer.length * 8;
+        //console.log('File size in bits: ' + size_in_bits);
+        var speed_bits_per_millisecs = size_in_bits / diff_time;
+        //console.log('Speed: ' + speed_bits_per_millisecs + 'bpms');
+        var speed_bits_per_sec = speed_bits_per_millisecs* 1000;
+        //console.log('Speed: ' + speed_bits_per_sec + 'bps');
+        var speed_Kbits_per_sec = speed_bits_per_sec / 1000;
+        console.log('Speed: ' + speed_Kbits_per_sec + 'Kbps');
+        var speed_Mbits_per_sec = speed_Kbits_per_sec / 1000;
+        console.log('Speed: ' + speed_Mbits_per_sec + 'Mbps');
+
+}).on('error', function(error) {
+        console.log(error);
+    })
+});
